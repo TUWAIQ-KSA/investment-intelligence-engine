@@ -1,6 +1,86 @@
-import { invokeLLM } from "./_core/llm";
 import { optimizeWeights, calculateWeightedScore } from "./learningEngine";
 import { generateMarketContext, compareWithMarket } from "./marketDataService";
+
+// LLM interface for AI analysis
+interface LLMMessage {
+  role: "system" | "user" | "assistant";
+  content: string;
+}
+
+interface LLMRequest {
+  messages: LLMMessage[];
+  response_format?: {
+    type: string;
+    json_schema?: any;
+  };
+}
+
+interface LLMResponse {
+  choices: Array<{
+    message: {
+      content: string | null;
+    };
+  }>;
+}
+
+/**
+ * Invokes the LLM for investment analysis
+ * In production, this would connect to OpenAI or similar API
+ */
+async function invokeLLM(request: LLMRequest): Promise<LLMResponse> {
+  // Check if OpenAI API key is configured
+  const apiKey = process.env.OPENAI_API_KEY;
+  
+  if (!apiKey) {
+    console.warn("[LLM] OpenAI API key not configured, returning mock response");
+    // Return a mock response for development/testing
+    return {
+      choices: [{
+        message: {
+          content: JSON.stringify({
+            score: 65,
+            summary: "تحليل تجريبي - يرجى تكوين مفتاح API للحصول على تحليل حقيقي",
+            strengths: ["نقطة قوة تجريبية 1", "نقطة قوة تجريبية 2"],
+            weaknesses: ["نقطة ضعف تجريبية 1"],
+            details: {
+              marketCondition: "مستقر",
+              riskLevel: "متوسط",
+              recommendation: "يُنصح بمراجعة التحليل مع خبير"
+            }
+          })
+        }
+      }]
+    };
+  }
+
+  try {
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model: "gpt-4",
+        messages: request.messages,
+        response_format: request.response_format,
+        temperature: 0.7,
+        max_tokens: 2000,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("[LLM] API error:", response.status, errorText);
+      throw new Error(`LLM API error: ${response.status}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("[LLM] Request failed:", error);
+    throw error;
+  }
+}
 
 export interface AnalysisInput {
   title: string;

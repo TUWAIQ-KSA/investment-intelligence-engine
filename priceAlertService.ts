@@ -5,7 +5,7 @@
 
 import { getDb } from "./db";
 import { eq, and, isNull, lte, gte } from "drizzle-orm";
-import { priceAlerts, notifications, type PriceAlert } from "../drizzle/schema";
+import { priceAlerts, notifications, type PriceAlert } from "./schema";
 import { fetchGoldPrices, fetchStockPrice, fetchRealEstateIndex } from "./marketDataService";
 
 interface AlertTrigger {
@@ -27,7 +27,7 @@ export async function checkAllAlerts(): Promise<AlertTrigger[]> {
     .from(priceAlerts)
     .where(
       and(
-        eq(priceAlerts.isActive, true),
+        eq(priceAlerts.isActive, 1),
         isNull(priceAlerts.triggeredAt)
       )
     );
@@ -297,7 +297,7 @@ export async function runAlertCheckJob(): Promise<{
   const activeAlerts = await db
     .select()
     .from(priceAlerts)
-    .where(eq(priceAlerts.isActive, true));
+    .where(eq(priceAlerts.isActive, 1));
 
   const triggered = await checkAllAlerts();
 

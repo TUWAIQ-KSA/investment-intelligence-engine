@@ -5,7 +5,7 @@
 
 import { getDb } from "./db";
 import { eq, and, gt } from "drizzle-orm";
-import { marketDataCache } from "../drizzle/schema";
+import { marketDataCache } from "./schema";
 
 interface GoldPrice {
   karat24: number;

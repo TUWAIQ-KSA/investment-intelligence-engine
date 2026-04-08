@@ -1,7 +1,15 @@
 import { eq, desc, and, like, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, analyses, InsertAnalysis, Analysis } from "../drizzle/schema";
-import { ENV } from './_core/env';
+import { InsertUser, users, analyses, InsertAnalysis, Analysis } from "./schema";
+
+// Environment interface
+interface Environment {
+  ownerOpenId?: string;
+}
+
+const ENV: Environment = {
+  ownerOpenId: process.env.OWNER_OPEN_ID,
+};
 
 let _db: ReturnType<typeof drizzle> | null = null;
 

@@ -5,7 +5,7 @@
 
 import { getDb } from "./db";
 import { eq, and, gte, desc } from "drizzle-orm";
-import { analyses } from "../drizzle/schema";
+import { analyses } from "./schema";
 
 interface WeightAdjustment {
   engine: string;
