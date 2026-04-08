@@ -53,6 +53,10 @@ async function invokeLLM(request: LLMRequest): Promise<LLMResponse> {
     };
   }
 
+  // Create AbortController for timeout
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 second timeout
+
   try {
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
@@ -67,7 +71,10 @@ async function invokeLLM(request: LLMRequest): Promise<LLMResponse> {
         temperature: 0.7,
         max_tokens: 2000,
       }),
+      signal: controller.signal,
     });
+
+    clearTimeout(timeoutId);
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -77,6 +84,11 @@ async function invokeLLM(request: LLMRequest): Promise<LLMResponse> {
 
     return await response.json();
   } catch (error) {
+    clearTimeout(timeoutId);
+    if (error instanceof Error && error.name === "AbortError") {
+      console.error("[LLM] Request timed out after 60 seconds");
+      throw new Error("LLM request timed out");
+    }
     console.error("[LLM] Request failed:", error);
     throw error;
   }

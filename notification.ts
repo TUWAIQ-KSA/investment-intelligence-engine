@@ -61,6 +61,10 @@ export async function notifyOwner(
     return false;
   }
 
+  // Create AbortController for timeout
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+
   try {
     const response = await fetch(`${ENV.forgeApiUrl}/notifications`, {
       method: "POST",
@@ -74,7 +78,10 @@ export async function notifyOwner(
         type: "investment_analysis",
         priority: "normal",
       }),
+      signal: controller.signal,
     });
+
+    clearTimeout(timeoutId);
 
     if (!response.ok) {
       console.error("[Notification] Failed to send notification:", response.status, await response.text());
@@ -83,6 +90,11 @@ export async function notifyOwner(
 
     return true;
   } catch (error) {
+    clearTimeout(timeoutId);
+    if (error instanceof Error && error.name === "AbortError") {
+      console.error("[Notification] Request timed out after 30 seconds");
+      return false;
+    }
     console.error("[Notification] Error sending notification:", error);
     return false;
   }
