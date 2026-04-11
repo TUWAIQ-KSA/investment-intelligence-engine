@@ -6,8 +6,7 @@
   },
   "extends": [
     "eslint:recommended",
-    "plugin:@typescript-eslint/recommended",
-    "plugin:react/recommended"
+    "plugin:@typescript-eslint/recommended"
   ],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
@@ -16,12 +15,13 @@
   },
   "plugins": [
     "@typescript-eslint",
-    "react"
+    "react-hooks",
+    "react-refresh"
   ],
-  "settings": {
-    "react": {
-      "version": "detect"
-    }
-  },
-  "rules": {}
+  "rules": {
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "warn",
+    "react-refresh/only-export-components": ["warn", { "allowConstantExport": true }],
+    "@typescript-eslint/no-explicit-any": "warn"
+  }
 }
