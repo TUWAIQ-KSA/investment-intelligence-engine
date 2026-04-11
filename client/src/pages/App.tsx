@@ -2,35 +2,33 @@ import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/NotFound";
 import { Route, Switch } from "wouter";
-import ErrorBoundary from "./components/ErrorBoundary";
-import { ThemeProvider } from "./contexts/ThemeContext";
-import Home from "./pages/Home";
-import NewAnalysis from "./pages/NewAnalysis";
-import AnalysisReport from "./pages/AnalysisReport";
+import ErrorBoundary from "../components/ErrorBoundary";
+import { ThemeProvider } from "../contexts/ThemeContext";
+import Home from "./Home";
+import NewAnalysis from "./NewAnalysis";
+import AnalysisReport from "./AnalysisReport";
 
 function Router() {
   return (
     <Switch>
-      <Route path={"/"} component={Home} />
-      <Route path={"/new"} component={NewAnalysis} />
-      <Route path={"/analysis/:id"} component={AnalysisReport} />
-      <Route path={"/404"} component={NotFound} />
+      <Route path="/" component={Home} />
+      <Route path="/new" component={NewAnalysis} />
+      <Route path="/analysis/:id" component={AnalysisReport} />
+      <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
     </Switch>
   );
 }
 
-function App() {
+export default function App() {
   return (
     <ErrorBoundary>
-      <ThemeProvider defaultTheme="light">
+      <ThemeProvider>
         <TooltipProvider>
-          <Toaster position="top-center" richColors />
           <Router />
+          <Toaster />
         </TooltipProvider>
       </ThemeProvider>
     </ErrorBoundary>
   );
 }
-
-export default App;
