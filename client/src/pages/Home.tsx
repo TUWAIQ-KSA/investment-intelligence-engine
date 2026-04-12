@@ -56,10 +56,10 @@ export default function Home() {
     { enabled: isAuthenticated, refetchInterval: 5000 }
   );
 
+  const utils = trpc.useUtils();
   const deleteMutation = trpc.analysis.delete.useMutation({
     onSuccess: () => { utils.analysis.list.invalidate(); utils.analysis.stats.invalidate(); },
   });
-  const utils = trpc.useUtils();
 
   if (authLoading) {
     return (

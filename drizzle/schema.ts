@@ -61,3 +61,52 @@ export const analyses = mysqlTable("analyses", {
 
 export type Analysis = typeof analyses.$inferSelect;
 export type InsertAnalysis = typeof analyses.$inferInsert;
+
+export const marketDataCache = mysqlTable("marketDataCache", {
+  id: int("id").autoincrement().primaryKey(),
+  assetType: mysqlEnum("assetType", ["real_estate", "vehicle", "gold", "stocks"]).notNull(),
+  assetIdentifier: varchar("assetIdentifier", { length: 255 }).notNull(),
+  currentPrice: varchar("currentPrice", { length: 50 }),
+  priceChange24h: varchar("priceChange24h", { length: 50 }),
+  priceChangePercent24h: varchar("priceChangePercent24h", { length: 50 }),
+  metadata: json("metadata"),
+  fetchedAt: timestamp("fetchedAt").defaultNow(),
+  expiresAt: timestamp("expiresAt"),
+  source: varchar("source", { length: 100 }),
+});
+
+export type MarketDataCache = typeof marketDataCache.$inferSelect;
+export type InsertMarketDataCache = typeof marketDataCache.$inferInsert;
+
+export const priceAlerts = mysqlTable("priceAlerts", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  assetType: mysqlEnum("assetType", ["real_estate", "vehicle", "gold", "stocks"]).notNull(),
+  assetIdentifier: varchar("assetIdentifier", { length: 255 }).notNull(),
+  alertType: mysqlEnum("alertType", ["price_above", "price_below", "percent_change"]).notNull(),
+  targetValue: decimal("targetValue", { precision: 15, scale: 2 }).notNull(),
+  currentPriceWhenSet: varchar("currentPriceWhenSet", { length: 50 }),
+  notes: text("notes"),
+  isActive: mysqlEnum("isActive", ["true", "false"]).default("true").notNull(),
+  triggerCount: int("triggerCount").default(0),
+  triggeredAt: timestamp("triggeredAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type PriceAlert = typeof priceAlerts.$inferSelect;
+export type InsertPriceAlert = typeof priceAlerts.$inferInsert;
+
+export const notifications = mysqlTable("notifications", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  type: varchar("type", { length: 50 }).notNull(),
+  title: varchar("title", { length: 255 }).notNull(),
+  content: text("content"),
+  isRead: mysqlEnum("isRead", ["true", "false"]).default("false").notNull(),
+  relatedAlertId: int("relatedAlertId"),
+  actionUrl: varchar("actionUrl", { length: 500 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type Notification = typeof notifications.$inferSelect;
+export type InsertNotification = typeof notifications.$inferInsert;
